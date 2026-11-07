@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Créa – Éditeur de design gratuit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Bangers&family=Bebas+Neue&family=Caveat&family=Cinzel&family=Dancing+Script&family=Lobster&family=Montserrat&family=Orbitron&family=Oswald&family=Pacifico&family=Permanent+Marker&family=Playfair+Display&family=Poppins&family=Press+Start+2P&family=Raleway&family=Righteous&family=Roboto&family=Satisfy&display=swap" rel="stylesheet">
+<style>
+:root{--v:#8b5cf6;--t:#22d3ee;--bg:#101116;--p:#1a1c24;--bd:#2c2f3b;--ink:#eceef5;--mut:#8d93a8;--f:#262935}
+*{box-sizing:border-box;margin:0}
+body{font:13px system-ui,sans-serif;color:var(--ink);height:100vh;display:grid;grid-template:58px 52px 1fr 100px/86px 1fr 290px;grid-template-areas:"h h h" "t t t" "l s r" "p p p";background:var(--bg)}
+header{grid-area:h;background:var(--p);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;padding:0 16px}
+header b{font-size:22px;font-weight:800;margin-right:auto;background:linear-gradient(90deg,var(--t),var(--v));-webkit-background-clip:text;background-clip:text;color:transparent}
+header button,header select{height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 14px;font:inherit;cursor:pointer;background:var(--f);color:var(--ink)}
+header button:hover{border-color:var(--v)}
+header #exp{background:linear-gradient(90deg,var(--t),var(--v));border:0;color:#fff;font-weight:700}
+nav{grid-area:l;background:var(--p);border-right:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;padding:8px;overflow:auto}
+nav button{border:0;background:none;color:var(--mut);border-radius:12px;padding:10px 0;cursor:pointer;font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button i{font-style:normal;font-size:22px;color:var(--ink)}
+nav button:hover,nav button.on{background:var(--f);color:#fff}
+#stage{grid-area:s;display:flex;align-items:center;justify-content:center;overflow:auto;min-width:0;background:radial-gradient(#2a2d3b 1.2px,transparent 1.2px) 0 0/24px 24px,var(--bg)}
+.canvas-container{box-shadow:0 14px 60px #000c}
+#panel{grid-area:r;background:var(--p);border-left:1px solid var(--bd);padding:16px;overflow:auto}
+#panel h4{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:18px 0 8px}
+#panel h4:first-child{margin-top:0}
+.row{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.row label{width:84px;color:var(--mut)}
+#panel input[type=range]{flex:1;min-width:80px;accent-color:var(--v)}
+#panel input[type=color]{width:36px;height:30px;border:1px solid var(--bd);border-radius:8px;padding:0;background:none}
+#panel input[type=number],#panel select{height:30px;border:1px solid var(--bd);border-radius:8px;padding:0 6px;font:inherit;width:70px;background:var(--f);color:var(--ink)}
+#panel select#font{width:160px}
+.b{border:1px solid var(--bd);background:var(--f);color:var(--ink);border-radius:8px;height:30px;min-width:32px;padding:0 10px;cursor:pointer;font:inherit}
+.b:hover{border-color:var(--v);color:#fff}
+.tx,.im,.ob,.sh{display:none}
+#panel:not([data-t=none]) .ob{display:block}
+#panel[data-t=i-text] .tx{display:block}
+#panel[data-t=image] .im{display:block}
+#panel:not([data-t=none]):not([data-t=image]) .sh{display:block}
+#hint{color:var(--mut);line-height:1.6;background:var(--f);padding:12px;border-radius:10px}
+#panel:not([data-t=none]) #hint{display:none}
+.sw{display:flex;gap:6px;flex-wrap:wrap}
+.sw span{width:34px;height:34px;border-radius:8px;cursor:pointer;border:2px solid var(--p);box-shadow:0 0 0 1px var(--bd)}
+.ly{display:flex;gap:6px;align-items:center;padding:7px 9px;border-radius:8px;cursor:pointer;color:var(--mut)}
+.ly span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ly.on{background:var(--f);color:#fff}.ly b{font-weight:400}
+.pop{position:fixed;left:94px;top:66px;width:320px;max-height:72vh;overflow:auto;background:var(--p);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 12px 40px #000a;z-index:9;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.pop[hidden]{display:none}
+.pop button{border:0;background:none;font-size:26px;cursor:pointer;border-radius:10px;height:46px;color:var(--ink)}
+.pop button:hover{background:var(--f)}
+.pop button[data-l]{border-radius:50%;width:46px}
+.pop h5{grid-column:1/-1;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:8px 0 2px;color:var(--mut)}
+#tpl{grid-template-columns:1fr 1fr;gap:8px}
+#tpl button{height:84px;font-size:14px;font-weight:700;color:#fff;border-radius:12px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--t);outline-offset:2px}
+@media(max-width:800px){body{grid-template:56px 52px 70px 1fr 220px 100px/1fr;grid-template-areas:"h" "t" "l" "s" "r" "p"}nav{flex-direction:row;border:0}nav button{min-width:64px}.pop{left:8px;top:140px}}
+#top{grid-area:t;background:var(--p);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:18px;padding:0 16px;overflow-x:auto;white-space:nowrap}
+#top .g{display:none;align-items:center;gap:8px}
+#top .g+.g{padding-left:18px;border-left:1px solid var(--bd)}
+#top label{color:var(--mut);font-size:12px}
+#top input[type=range]{width:90px;accent-color:var(--v)}
+#top input[type=color]{width:30px;height:28px;border:1px solid var(--bd);border-radius:8px;padding:0;background:none}
+#top select{height:28px;background:var(--f);color:var(--ink);border:1px solid var(--bd);border-radius:8px;padding:0 6px}
+#top .none{color:var(--mut)}
+#top:not([data-t=none]) .none{display:none}
+#top:not([data-t=none]) .g-glow{display:flex}
+#top[data-t=light] .g-light{display:flex}
+#top[data-t=image] .g-img{display:flex}
+#panel[data-t=light] .sh{display:none!important}
+html[data-theme=light]{--bg:#eef2fb;--p:#ffffff;--bd:#d9e0f0;--ink:#1b2340;--mut:#68718f;--f:#f0f3fb;--v:#2563eb;--t:#38bdf8}
+html[data-theme=light] #stage{background:radial-gradient(#cdd5ea 1.2px,transparent 1.2px) 0 0/24px 24px,var(--bg)}
+#stage{align-items:stretch;justify-content:flex-start}.canvas-container{margin:auto!important;flex:none}
+#stage.grid .canvas-container::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(#0003 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,#0003 1px,transparent 1px) 0 0/40px 40px}
+header b{margin-right:8px!important}#st{margin-right:auto;color:var(--mut);font-size:12px}
+#pname{height:36px;width:170px;border:1px solid var(--bd);border-radius:10px;background:var(--f);color:var(--ink);padding:0 10px;font:inherit}
+#pages{grid-area:p;background:var(--p);border-top:1px solid var(--bd);display:flex;gap:16px;align-items:center;padding:6px 14px}
+#pgs{display:flex;gap:10px;flex:1;overflow-x:auto;padding:4px}#pgact{display:flex;gap:6px;align-items:center;flex:none}
+.pg{flex:none;height:78px;min-width:62px;border-radius:8px;border:2px solid var(--bd);background:var(--f);cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pg img{max-height:100%;max-width:130px}.pg.on{border-color:var(--v)}
+.pg i{position:absolute;left:4px;top:3px;font:600 11px system-ui;color:#fff;background:#000a;border-radius:6px;padding:0 5px}
+.modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:30}.modal[hidden]{display:none}
+.mc{background:var(--p);border:1px solid var(--bd);border-radius:16px;padding:22px;width:min(440px,92vw)}.mc h3{margin-bottom:12px}
+.mc .row label{width:84px;color:var(--mut)}
+.mc input:not([type=checkbox]):not([type=color]),.mc select{height:32px;background:var(--f);color:var(--ink);border:1px solid var(--bd);border-radius:8px;padding:0 8px;font:inherit}
+#home{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto}#home[hidden]{display:none}
+.hw{max-width:1100px;margin:0 auto;padding:24px}.hh{display:flex;gap:12px;align-items:center}
+.hh b{font-size:26px;font-weight:800;color:var(--v)}
+.hh input{flex:1;height:46px;border-radius:23px;border:1px solid var(--bd);background:var(--p);color:var(--ink);padding:0 20px;font:inherit}
+#home h1{font-size:36px;margin:36px 0 4px;background:linear-gradient(90deg,var(--t),var(--v));-webkit-background-clip:text;background-clip:text;color:transparent}
+#home h2{font-size:16px;margin:28px 0 12px}
+.hg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.hc{border:1px solid var(--bd);background:var(--p);border-radius:14px;cursor:pointer;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.hc:hover,.hc:focus-visible{transform:translateY(-3px);box-shadow:0 10px 30px #0003}.hc[hidden]{display:none}
+.hc .th{height:110px;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--f) center/cover}
+.hc span{display:block;padding:10px 12px 2px;font-weight:600}.hc small{display:block;padding:0 12px 10px;color:var(--mut)}
+#show{position:fixed;inset:0;background:#000;z-index:50;display:flex;align-items:center;justify-content:center}#show[hidden]{display:none}
+#show img{max-width:96vw;max-height:96vh;transition:opacity .3s}
+#sx{position:absolute;top:14px;right:14px;background:#ffffff30;color:#fff;border:0;border-radius:50%;width:38px;height:38px;cursor:pointer}
+#toasts{position:fixed;right:16px;bottom:116px;display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;box-shadow:0 6px 20px #0006;animation:tin .25s}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <b id="logo" style="cursor:pointer" title="Accueil">Créa</b><input id="pname" value="Sans titre" aria-label="Nom du projet"><span id="st">Enregistré</span>
+  <select id="size" aria-label="Format"></select>
+  <button id="un" title="Annuler (Ctrl+Z)">↶</button>
+  <button id="re" title="Rétablir (Ctrl+Y)">↷</button>
+  <select id="fmt" hidden aria-label="Type de fichier"><option value="png">PNG</option><option value="jpeg">JPG</option></select>
+  <button id="pres">▶ Présenter</button><button id="th" title="Clair / sombre">◐</button><button id="exp">Exporter</button>
+</header>
+<div id="top" data-t="none">
+  <span class="none">Sélectionne un élément : ses réglages de lumière, de couleur et de lueur apparaissent ici.</span>
+  <div class="g g-light"><b>✨ Lumière</b>
+    <label>Couleur</label><input type="color" id="lc" value="#ffe1a0">
+    <label>Luminosité</label><input type="range" id="lb" min=".1" max="1" step=".02" value="1">
+    <label>Douceur</label><input type="range" id="ls" min="0" max="1" step=".02" value=".6">
+    <label>Taille</label><input type="range" id="lz" min="2" max="300" value="30">
+    <label>Fusion</label><select id="lm"><option value="screen">Éclaircir</option><option value="lighter">Additif (très fort)</option><option value="overlay">Superposition</option><option value="source-over">Normal</option></select></div>
+  <div class="g g-img"><b>Photo</b><button class="b" id="tai">✨ Enlever le fond</button><button class="b" id="tpk">Gomme couleur</button>
+    <label>Luminosité</label><input type="range" id="tbr" min="-.5" max=".5" step=".02" value="0">
+    <label>Contraste</label><input type="range" id="tct" min="-.5" max=".5" step=".02" value="0">
+    <label>Saturation</label><input type="range" id="tsa" min="-1" max="1" step=".05" value="0"><select id="tfl" class="b" aria-label="Filtres"><option value="">Filtres…</option><option value="nb">Noir et blanc</option><option value="vintage">Vintage</option><option value="warm">Chaud</option><option value="cold">Froid</option><option value="drama">Dramatique</option><option value="soft">Doux</option><option value="film">Film</option><option value="none">Original</option></select></div>
+  <div class="g g-glow"><b>💡 Lueur de l'objet</b>
+    <label>Couleur</label><input type="color" id="tgc" value="#ffe08a">
+    <label>Intensité</label><input type="range" id="tga" min="0" max="1" step=".05" value="1">
+    <label>Étendue</label><input type="range" id="tgb" min="0" max="120" value="0"></div>
+</div>
+<nav>
+  <button data-a="tpl"><i>▦</i>Modèles</button>
+  <button data-a="text"><i>T</i>Texte</button>
+  <button data-a="rect"><i>▭</i>Rectangle</button>
+  <button data-a="circle"><i>◯</i>Cercle</button>
+  <button data-a="tri"><i>△</i>Triangle</button>
+  <button data-a="star"><i>☆</i>Étoile</button>
+  <button data-a="line"><i>―</i>Ligne</button>
+  <button data-a="img"><i>🖼</i>Photo</button>
+  <button data-a="stk"><i>✨</i>Stickers</button>
+  <button data-a="vig"><i>◐</i>Vignette</button>
+  <button data-a="draw"><i>✏️</i>Dessin</button>
+</nav>
+<div id="stage"><canvas id="cv"></canvas></div>
+<aside id="panel" data-t="none">
+  <p id="hint">Ajoutez un élément à gauche ou glissez une photo sur la page. Cliquez sur un élément pour le modifier : tirez les ronds blancs pour l’agrandir, le rond du haut pour le tourner.</p>
+  <div class="sh">
+    <h4>Couleurs</h4>
+    <div class="row"><label>Remplissage</label><input type="color" id="fill"></div>
+    <div class="row tx" style="display:none"></div>
+    <div class="row"><label>Contour</label><input type="color" id="stroke"><input type="number" id="sw" min="0" max="60" value="0" title="Épaisseur"></div>
+  </div>
+  <div class="tx">
+    <h4>Texte</h4>
+    <div class="row"><select id="font"></select><input type="number" id="fs" min="8" max="400" value="90"></div>
+    <div class="row"><button class="b" data-ts="out">Contour</button><button class="b" data-ts="hl">Surligné</button><button class="b" data-ts="gr">Dégradé</button><button class="b" data-ts="no">Normal</button></div>
+    <div class="row"><button class="b" id="bo"><b>B</b></button><button class="b" id="it"><i>I</i></button><button class="b" id="ul"><u>U</u></button><button class="b" data-al="left">⇤</button><button class="b" data-al="center">↔</button><button class="b" data-al="right">⇥</button></div>
+  </div>
+  <div class="im">
+    <h4>Retouche photo</h4>
+    <div class="row"><label>Luminosité</label><input type="range" id="br" min="-.5" max=".5" step=".02" value="0"></div>
+    <div class="row"><label>Contraste</label><input type="range" id="ct" min="-.5" max=".5" step=".02" value="0"></div>
+    <div class="row"><label>Saturation</label><input type="range" id="sa" min="-1" max="1" step=".05" value="0"></div>
+    <div class="row"><label>Flou</label><input type="range" id="bl" min="0" max=".6" step=".02" value="0"></div>
+    <div class="row"><button class="b" data-pre="Grayscale">N&amp;B</button><button class="b" data-pre="Sepia">Sépia</button><button class="b" data-pre="Invert">Inversé</button><button class="b" data-pre="">Original</button></div>
+    <div class="row"><label>Teinte</label><input type="range" id="hu" min="-1" max="1" step=".02" value="0"></div>
+    <div class="row"><label>Chaleur</label><input type="range" id="wm" min="-1" max="1" step=".05" value="0"></div>
+    <div class="row"><label>Netteté</label><input type="range" id="sp" min="0" max="1" step=".05" value="0"></div>
+    <div class="row"><button class="b" id="fh">⇋ Miroir</button></div>
+    <h4>Forme de la photo</h4>
+    <div class="row"><button class="b" data-mk="circle">Cercle</button><button class="b" data-mk="round">Arrondi</button><button class="b" data-mk="heart">Cœur</button><button class="b" data-mk="">Aucun</button></div>
+    <h4>Enlever l'arrière-plan</h4>
+    <div class="row"><button class="b" id="ai">✨ Automatique (IA)</button></div>
+    <div class="row"><button class="b" id="pk">Gomme couleur : cliquer sur le fond</button></div>
+    <div class="row"><label>Tolérance</label><input type="range" id="tol" min="5" max="120" value="40"></div>
+    <div class="row"><label><input type="checkbox" id="glob"> Partout</label></div>
+    <p id="msg" style="color:#5a607a;font-size:12px;line-height:1.4"></p>
+  </div>
+  <div class="ob">
+    <h4>Taille et forme</h4>
+    <div class="row"><label>X / Y</label><input type="number" id="nx"><input type="number" id="ny"></div>
+    <div class="row"><label>L / H</label><input type="number" id="nw"><input type="number" id="nh"></div>
+    <div class="row"><label style="width:auto"><input type="checkbox" id="lk" checked> Proportions</label><button class="b" id="grp">Grouper</button><button class="b" id="ugr">Dégrouper</button></div>
+    <div class="row"><label>Taille</label><input type="range" id="sz" min="2" max="200" value="30"></div>
+    <div class="row"><label>Largeur</label><input type="range" id="wd" min="2" max="200" value="30"></div>
+    <div class="row"><label>Hauteur</label><input type="range" id="ht" min="2" max="200" value="30"></div>
+    <div class="row"><label>Rotation</label><input type="range" id="rot" min="0" max="360" value="0"></div>
+    <div class="row"><button class="b" id="plus">＋ Agrandir</button><button class="b" id="minus">－ Réduire</button></div>
+    <h4>Ombre et lueur</h4>
+    <div class="row"><label>Couleur</label><input type="color" id="shc" value="#ffe08a"></div>
+    <div class="row"><label>Intensité</label><input type="range" id="shb" min="0" max="80" value="0"></div>
+    <div class="row"><label>Décalage</label><input type="range" id="sho" min="-40" max="40" value="0"></div>
+    <div class="row"><button class="b" id="neon">Effet néon</button></div>
+    <h4>Position</h4>
+    <div class="row"><button class="b" data-ag="l">⇤</button><button class="b" data-ag="h">↔ Centrer</button><button class="b" data-ag="r">⇥</button><button class="b" data-ag="t">⤒</button><button class="b" data-ag="v">↕ Centrer</button><button class="b" data-ag="b">⤓</button></div>
+    <div class="row"><label>Opacité</label><input type="range" id="op" min="0" max="1" step=".05" value="1"></div>
+    <div class="row"><button class="b" id="fr">Premier plan</button><button class="b" id="bk">Arrière-plan</button></div>
+    <div class="row"><button class="b" id="dup">Dupliquer</button><button class="b" id="del">Supprimer</button></div>
+  </div>
+  <h4>Fond de la page</h4>
+  <div class="row"><label>Couleur</label><input type="color" id="bg" value="#ffffff"></div>
+  <div class="sw" id="grad"></div>
+  <h4>Pinceau</h4>
+  <div class="row"><label>Couleur</label><input type="color" id="bc" value="#8b5cf6"></div>
+  <div class="row"><label>Taille</label><input type="range" id="bw" min="1" max="80" value="12"></div>
+  <h4>Calques</h4>
+  <div id="lay"></div>
+</aside>
+<div id="pages"><div id="pgs"></div><div id="pgact"><button class="b" id="pgadd">＋ Page</button><button class="b" id="pgdup">Dupliquer</button><button class="b" id="pgdel">Supprimer</button><button class="b" id="pgl" title="Déplacer à gauche">◀</button><button class="b" id="pgr" title="Déplacer à droite">▶</button><button class="b" id="gr">Grille</button><select id="zs" class="b" aria-label="Zoom"><option value="0">Ajuster</option><option value=".1">10 %</option><option value=".25">25 %</option><option value=".5">50 %</option><option value=".75">75 %</option><option value="1">100 %</option><option value="1.25">125 %</option><option value="1.5">150 %</option><option value="2">200 %</option><option value="4">400 %</option></select></div></div>
+<div id="home"><div class="hw">
+  <div class="hh"><b>Créa</b><input id="hs" placeholder="Rechercher : miniature, affiche, logo, story…" aria-label="Rechercher"><button class="b" id="hb" hidden>↩ Retour à l'éditeur</button><button class="b" id="hth" title="Clair / sombre">◐</button></div>
+  <h1>Que souhaitez-vous créer aujourd'hui ?</h1>
+  <h2>Créer un design</h2><div class="hg" id="hf"></div>
+  <h2>Modèles</h2><div class="hg" id="ht"></div>
+  <h2>Projets récents</h2><div class="hg" id="hr"></div>
+</div></div>
+<div id="newm" class="modal" hidden><div class="mc"><h3>Nouveau projet</h3>
+  <div class="row"><label>Nom</label><input id="nn" value="Sans titre"></div>
+  <div class="row"><label>Largeur</label><input id="nw2" type="number" value="1080" min="1" style="width:90px"><label style="width:auto">Hauteur</label><input id="nh2" type="number" value="1080" min="1" style="width:90px"></div>
+  <div class="row"><label>Unité</label><select id="nu"><option value="1">Pixels</option><option value="3.7795">Millimètres</option><option value="37.795">Centimètres</option><option value="96">Pouces</option></select></div>
+  <div class="row"><label>Orientation</label><select id="no"><option value="">Telle quelle</option><option value="p">Portrait</option><option value="l">Paysage</option><option value="s">Carré</option></select></div>
+  <div class="row"><label>Fond</label><input type="color" id="nb" value="#ffffff"><label style="width:auto">Pages</label><input type="number" id="npg" value="1" min="1" max="30" style="width:70px"></div>
+  <div class="row"><button class="b" id="nok">Créer</button><button class="b" id="nno">Annuler</button></div></div></div>
+<div id="exm" class="modal" hidden><div class="mc"><h3>Exporter</h3>
+  <div class="row"><label>Format</label><select id="xf"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="svg">SVG</option><option value="pdf">PDF</option><option value="json">Projet (JSON)</option></select></div>
+  <div class="row"><label>Taille</label><select id="xs"><option value="1">1×</option><option value="2">2×</option><option value="3">3×</option></select></div>
+  <div class="row"><label>Pages</label><select id="xp"><option value="c">Page actuelle</option><option value="a">Toutes les pages</option></select></div>
+  <div class="row"><label style="width:auto"><input type="checkbox" id="xt"> PNG transparent</label></div>
+  <div class="row"><button class="b" id="xok">Télécharger</button><button class="b" id="xno">Annuler</button></div></div></div>
+<div id="show" hidden><img alt=""><button id="sx" aria-label="Fermer">✕</button></div>
+<div id="toasts"></div>
+<div id="stk" class="pop" hidden></div><div id="tpl" class="pop" hidden></div>
+<input type="file" id="file" accept="image/*,.svg,.json" hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
